@@ -20,9 +20,10 @@ let nextNumber n = if n%2L=0L then n/2L else 3L*n+1L
 
 let memoize f =
     let cache = Dictionary<_,_>()
-    fun x ->
-        if cache.ContainsKey(x) then cache.[x] 
-        else
+    fun x -> 
+        match cache.TryGetValue x with
+        | true, res -> res
+        | _ ->
             let res = f x
             cache.[x] <- res
             res
