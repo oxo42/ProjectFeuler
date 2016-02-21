@@ -14,17 +14,26 @@ Which starting number, under one million, produces the longest chain?
 NOTE: Once the chain starts the terms are allowed to go above one million.
 *)
 
-let nextNumber n = if n%2=0 then n/2 else 3*n+1
-let collatzGenerator = function
-    | 0 -> None
-    | 1 -> Some (1, 0)
-    | n -> Some (n, nextNumber n)
+open System.Collections.Generic
 
-let collatzNumbers n = 
-    List.unfold collatzGenerator n
+let nextNumber n = if n%2L=0L then n/2L else 3L*n+1L
 
-[|1..1000000|]
-|> Array.Parallel.map (fun x -> (x, x |> collatzNumbers |> List.length))
-|> Array.maxBy (fun (n,l) -> l)
+let memoize f =
+    let cache = Dictionary<_,_>()
+    fun x ->
+        if cache.ContainsKey(x) then cache.[x] 
+        else
+            let res = f x
+            cache.[x] <- res
+            res
 
+let collatzLength n =
+    let rec inner n =
+        match n with
+        | 1L -> 1L
+        | _ -> 1L + inner (nextNumber n)
+        
+    memoize inner n
 
+[1L..1000000L]
+|> List.maxBy collatzLength
